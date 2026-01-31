@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { PitchPlayer } from '../types';
 
 const jerseySVG = (color: string) => `
@@ -5,6 +6,10 @@ const jerseySVG = (color: string) => `
   <path d="M15 2 L5 14 L12 18 L12 54 L48 54 L48 18 L55 14 L45 2 L38 8 C35 10 25 10 22 8 Z"
     fill="${color}" stroke="rgba(255,255,255,0.3)" stroke-width="1"/>
 </svg>`;
+
+function playerImgUrl(imgId: string) {
+  return `https://img.uefa.com/imgml/TP/players/1/2026/cutoff/${imgId}.webp`;
+}
 
 interface Props {
   player: PitchPlayer;
@@ -17,6 +22,8 @@ interface Props {
 
 export function Player({ player, index, isDragging, isDropTarget, onMouseDown, onTouchStart }: Props) {
   const color = player.pos === 'GK' ? '#f4c542' : '#4fc3f7';
+  const [imgError, setImgError] = useState(false);
+  useEffect(() => { setImgError(false); }, [player.imgId]);
 
   let className = 'player';
   if (isDragging) className += ' dragging';
@@ -31,11 +38,21 @@ export function Player({ player, index, isDragging, isDropTarget, onMouseDown, o
       onMouseDown={(e) => onMouseDown(e, index, 'player')}
       onTouchStart={(e) => onTouchStart(e, index, 'player')}
     >
-      <div className="jersey">
-        <div dangerouslySetInnerHTML={{ __html: jerseySVG(color) }} />
-        <span className="jersey-number">{player.num}</span>
-      </div>
-      <span className="player-name">{player.name}</span>
+      {player.imgId && !imgError ? (
+        <img
+          className="player-photo"
+          src={playerImgUrl(player.imgId)}
+          alt={player.name}
+          onError={() => setImgError(true)}
+          draggable={false}
+        />
+      ) : (
+        <div className="jersey">
+          <div dangerouslySetInnerHTML={{ __html: jerseySVG(color) }} />
+          <span className="jersey-number">{player.num}</span>
+        </div>
+      )}
+      <span className="player-name">{player.num}. {player.name}</span>
     </div>
   );
 }

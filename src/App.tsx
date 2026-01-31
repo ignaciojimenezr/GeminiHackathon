@@ -1,15 +1,47 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Pitch } from './components/Pitch';
 import { SubsBench } from './components/SubsBench';
-import { FORMATION_433 } from './formations';
+import { FORMATIONS, type FormationSlot } from './formations';
 import type { PlayerData, PitchPlayer, SquadsData } from './types';
 import './App.css';
 
-function pickStarting11(squad: PlayerData[]): { starters: PitchPlayer[]; subs: PlayerData[] } {
+const TEAM_BADGES: Record<string, string> = {
+  'Arsenal': '52280',
+  'Barcelona': '50080',
+  'Bayern München': '50037',
+  'Chelsea': '52914',
+  'Liverpool': '7889',
+  'Man City': '52919',
+  'Sporting CP': '50149',
+  'Tottenham': '1652',
+  'Atalanta': '52816',
+  'Atlético Madrid': '50124',
+  'Borussia Dortmund': '52758',
+  'Benfica': '50147',
+  'Bodø/Glimt': '59333',
+  'Club Brugge': '50043',
+  'Galatasaray': '50067',
+  'Inter': '50138',
+  'Juventus': '50139',
+  'Leverkusen': '50109',
+  'Monaco': '50023',
+  'Newcastle': '59324',
+  'Olympiacos': '2610',
+  'Paris Saint-Germain': '52747',
+  'Qarabağ': '60609',
+  'Real Madrid': '50051',
+};
+
+function badgeUrl(team: string) {
+  const id = TEAM_BADGES[team];
+  return id ? `https://img.uefa.com/imgml/TP/teams/logos/100x100/${id}.png` : '';
+}
+
+function pickStarting11(squad: PlayerData[], formation: FormationSlot[]): { starters: PitchPlayer[]; subs: PlayerData[] } {
   const used = new Set<number>();
   const starters: PitchPlayer[] = [];
 
-  for (const slot of FORMATION_433) {
+  for (const slot of formation) {
     const player = squad.find((p, i) => p.pos === slot.category && !used.has(i));
     if (player) {
       const idx = squad.indexOf(player);
@@ -34,6 +66,7 @@ export default function App() {
   const [selectedTeam, setSelectedTeam] = useState('');
   const [pitchPlayers, setPitchPlayers] = useState<PitchPlayer[]>([]);
   const [subPlayers, setSubPlayers] = useState<PlayerData[]>([]);
+  const [formation, setFormation] = useState('4-3-3');
 
   // Drag state
   const [dragSrcType, setDragSrcType] = useState<string | null>(null);
@@ -54,10 +87,10 @@ export default function App() {
 
   useEffect(() => {
     if (!squads[selectedTeam]) return;
-    const { starters, subs } = pickStarting11(squads[selectedTeam]);
+    const { starters, subs } = pickStarting11(squads[selectedTeam], FORMATIONS[formation]);
     setPitchPlayers(starters);
     setSubPlayers(subs);
-  }, [selectedTeam, squads]);
+  }, [selectedTeam, squads, formation]);
 
   const getClientPos = (e: MouseEvent | TouchEvent | React.MouseEvent | React.TouchEvent) => {
     if ('touches' in e) {
@@ -70,8 +103,12 @@ export default function App() {
   const createGhost = (player: PlayerData, x: number, y: number) => {
     const ghost = document.createElement('div');
     ghost.className = 'drag-ghost';
-    const color = player.pos === 'GK' ? '#f4c542' : '#4fc3f7';
-    ghost.innerHTML = `<div class="jersey"><svg viewBox="0 0 60 58" xmlns="http://www.w3.org/2000/svg"><path d="M15 2 L5 14 L12 18 L12 54 L48 54 L48 18 L55 14 L45 2 L38 8 C35 10 25 10 22 8 Z" fill="${color}" stroke="rgba(255,255,255,0.3)" stroke-width="1"/></svg><span class="jersey-number">${player.num}</span></div>`;
+    if (player.imgId) {
+      ghost.innerHTML = `<div class="player-photo" style="width:48px;height:48px"><img src="https://img.uefa.com/imgml/TP/players/1/2026/cutoff/${player.imgId}.webp" style="width:100%;height:100%;object-fit:cover;border-radius:50%"/></div>`;
+    } else {
+      const color = player.pos === 'GK' ? '#f4c542' : '#4fc3f7';
+      ghost.innerHTML = `<div class="jersey"><svg viewBox="0 0 60 58" xmlns="http://www.w3.org/2000/svg"><path d="M15 2 L5 14 L12 18 L12 54 L48 54 L48 18 L55 14 L45 2 L38 8 C35 10 25 10 22 8 Z" fill="${color}" stroke="rgba(255,255,255,0.3)" stroke-width="1"/></svg><span class="jersey-number">${player.num}</span></div>`;
+    }
     ghost.style.left = x + 'px';
     ghost.style.top = y + 'px';
     document.body.appendChild(ghost);
@@ -119,7 +156,7 @@ export default function App() {
           const pitchPlayer = nextPitch[pIdx];
           const subPlayer = nextSubs[sIdx];
           nextPitch[pIdx] = { ...subPlayer, x: pitchPlayer.x, y: pitchPlayer.y, slotPos: pitchPlayer.slotPos };
-          nextSubs[sIdx] = { name: pitchPlayer.name, num: pitchPlayer.num, pos: pitchPlayer.pos };
+          nextSubs[sIdx] = { name: pitchPlayer.name, num: pitchPlayer.num, pos: pitchPlayer.pos, imgId: pitchPlayer.imgId };
           return nextSubs;
         });
         return nextPitch;
@@ -204,39 +241,51 @@ export default function App() {
 
   return (
     <div className="app">
-      <div className="header">
-        <h1>Squad Management</h1>
-        <select
-          className="team-select"
-          value={selectedTeam}
-          onChange={(e) => setSelectedTeam(e.target.value)}
-        >
-          {teamNames.map(name => (
-            <option key={name} value={name}>{name}</option>
-          ))}
-        </select>
-        <div className="formation-label">4 — 3 — 3</div>
+      <div className="main-area">
+        <div className="sidebar-left">
+          {selectedTeam && badgeUrl(selectedTeam) && (
+            <img className="team-badge" src={badgeUrl(selectedTeam)} alt={selectedTeam} />
+          )}
+          <select
+            className="team-select"
+            value={selectedTeam}
+            onChange={(e) => setSelectedTeam(e.target.value)}
+          >
+            {teamNames.map(name => (
+              <option key={name} value={name}>{name}</option>
+            ))}
+          </select>
+          <select
+            className="team-select"
+            value={formation}
+            onChange={(e) => setFormation(e.target.value)}
+          >
+            {Object.keys(FORMATIONS).map(f => (
+              <option key={f} value={f}>{f}</option>
+            ))}
+          </select>
+        </div>
+
+        <Pitch
+          players={pitchPlayers}
+          draggingIdx={dragSrcIdx}
+          draggingType={dragSrcType}
+          dropTargetIdx={dropTargetIdx}
+          dropTargetType={dropTargetType}
+          onMouseDown={onDragStart as any}
+          onTouchStart={onDragStart as any}
+        />
+
+        <SubsBench
+          subs={subPlayers}
+          draggingIdx={dragSrcIdx}
+          draggingType={dragSrcType}
+          dropTargetIdx={dropTargetIdx}
+          dropTargetType={dropTargetType}
+          onMouseDown={onDragStart as any}
+          onTouchStart={onDragStart as any}
+        />
       </div>
-
-      <Pitch
-        players={pitchPlayers}
-        draggingIdx={dragSrcIdx}
-        draggingType={dragSrcType}
-        dropTargetIdx={dropTargetIdx}
-        dropTargetType={dropTargetType}
-        onMouseDown={onDragStart as any}
-        onTouchStart={onDragStart as any}
-      />
-
-      <SubsBench
-        subs={subPlayers}
-        draggingIdx={dragSrcIdx}
-        draggingType={dragSrcType}
-        dropTargetIdx={dropTargetIdx}
-        dropTargetType={dropTargetType}
-        onMouseDown={onDragStart as any}
-        onTouchStart={onDragStart as any}
-      />
     </div>
   );
 }

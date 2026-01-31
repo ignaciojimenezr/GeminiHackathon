@@ -2,6 +2,7 @@ export interface PlayerData {
   name: string;
   num: number;
   pos: 'GK' | 'DEF' | 'MID' | 'FWD';
+  imgId?: string;
 }
 
 export interface PitchPlayer extends PlayerData {
