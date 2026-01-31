@@ -74,6 +74,7 @@ interface AppProps {
 export default function App({ initialSquads, initialTeam }: AppProps = {}) {
   const [squads, setSquads] = useState<SquadsData>(initialSquads ?? {});
   const [selectedTeam, setSelectedTeam] = useState(initialTeam ?? '');
+  useEffect(() => { if (initialTeam) setSelectedTeam(initialTeam); }, [initialTeam]);
   const [pitchPlayers, setPitchPlayers] = useState<PitchPlayer[]>([]);
   const [subPlayers, setSubPlayers] = useState<PlayerData[]>([]);
 
