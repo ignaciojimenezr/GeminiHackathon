@@ -103,6 +103,8 @@ export default function App({ initialSquads, initialTeam }: AppProps = {}) {
     setSubPlayers(subs);
   }, [selectedTeam, squads]);
 
+  const pitchRef = useRef<HTMLDivElement>(null);
+
   const getClientPos = (e: MouseEvent | TouchEvent | React.MouseEvent | React.TouchEvent) => {
     if ('touches' in e) {
       const t = (e as TouchEvent).touches?.[0] || (e as TouchEvent).changedTouches?.[0];
@@ -214,6 +216,18 @@ export default function App({ initialSquads, initialTeam }: AppProps = {}) {
 
       if (target) {
         doSwap(type, idx, target.type, target.idx);
+      } else if (type === 'player' && pitchRef.current) {
+        // Free drag: drop on empty pitch area → move player to that position
+        const pitchRect = pitchRef.current.getBoundingClientRect();
+        if (pos.x >= pitchRect.left && pos.x <= pitchRect.right && pos.y >= pitchRect.top && pos.y <= pitchRect.bottom) {
+          const newX = ((pos.x - pitchRect.left) / pitchRect.width) * 100;
+          const newY = ((pos.y - pitchRect.top) / pitchRect.height) * 100;
+          setPitchPlayers(prev => {
+            const next = [...prev];
+            next[idx] = { ...next[idx], x: newX, y: newY };
+            return next;
+          });
+        }
       }
 
       setDragSrcType(null);
@@ -259,6 +273,7 @@ export default function App({ initialSquads, initialTeam }: AppProps = {}) {
         </div>
 
         <Pitch
+          ref={pitchRef}
           players={pitchPlayers}
           draggingIdx={dragSrcIdx}
           draggingType={dragSrcType}

@@ -10,7 +10,6 @@ import squadsJson from '../public/data/squads.json';
 function McpSquadApp() {
   const [squads] = useState<SquadsData>(squadsJson as SquadsData);
   const [team, setTeam] = useState<string>(() => Object.keys(squadsJson)[0] || '');
-
   const { app, error } = useApp({
     appInfo: { name: 'Squad Manager', version: '1.0.0' },
     capabilities: {},

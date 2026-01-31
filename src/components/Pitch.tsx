@@ -1,3 +1,4 @@
+import { forwardRef } from 'react';
 import { PitchPlayer } from '../types';
 import { Player } from './Player';
 
@@ -11,9 +12,9 @@ interface Props {
   onTouchStart: (e: React.TouchEvent, index: number, type: 'player') => void;
 }
 
-export function Pitch({ players, draggingIdx, draggingType, dropTargetIdx, dropTargetType, onMouseDown, onTouchStart }: Props) {
+export const Pitch = forwardRef<HTMLDivElement, Props>(function Pitch({ players, draggingIdx, draggingType, dropTargetIdx, dropTargetType, onMouseDown, onTouchStart }, ref) {
   return (
-    <div className="pitch">
+    <div className="pitch" ref={ref}>
       <div className="center-dot" />
       <div className="box-top" />
       <div className="box-bottom" />
@@ -30,4 +31,4 @@ export function Pitch({ players, draggingIdx, draggingType, dropTargetIdx, dropT
       ))}
     </div>
   );
-}
+});
