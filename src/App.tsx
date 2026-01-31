@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Pitch } from './components/Pitch';
 import { SubsBench } from './components/SubsBench';
-import { FORMATIONS, type FormationSlot } from './formations';
+import { FORMATION_433, type FormationSlot } from './formations';
 import type { PlayerData, PitchPlayer, SquadsData } from './types';
 import './App.css';
 
@@ -48,7 +48,6 @@ function pickStarting11(squad: PlayerData[], formation: FormationSlot[]): { star
       used.add(idx);
       starters.push({ ...player, x: slot.x, y: slot.y, slotPos: slot.label });
     } else {
-      // fallback: prefer nearby positions (MID for FWD, DEF for MID, etc.), never GK
       const priority = slot.category === 'FWD' ? ['MID','DEF'] : slot.category === 'MID' ? ['FWD','DEF'] : ['MID','FWD'];
       let fallback = -1;
       for (const cat of priority) {
@@ -67,12 +66,16 @@ function pickStarting11(squad: PlayerData[], formation: FormationSlot[]): { star
   return { starters, subs };
 }
 
-export default function App() {
-  const [squads, setSquads] = useState<SquadsData>({});
-  const [selectedTeam, setSelectedTeam] = useState('');
+interface AppProps {
+  initialSquads?: SquadsData;
+  initialTeam?: string;
+}
+
+export default function App({ initialSquads, initialTeam }: AppProps = {}) {
+  const [squads, setSquads] = useState<SquadsData>(initialSquads ?? {});
+  const [selectedTeam, setSelectedTeam] = useState(initialTeam ?? '');
   const [pitchPlayers, setPitchPlayers] = useState<PitchPlayer[]>([]);
   const [subPlayers, setSubPlayers] = useState<PlayerData[]>([]);
-  const [formation, setFormation] = useState('4-3-3');
 
   // Drag state
   const [dragSrcType, setDragSrcType] = useState<string | null>(null);
@@ -82,6 +85,7 @@ export default function App() {
   const ghostRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
+    if (initialSquads) return;
     fetch('/data/squads.json')
       .then(r => r.json())
       .then((data: SquadsData) => {
@@ -89,14 +93,14 @@ export default function App() {
         const firstTeam = Object.keys(data)[0];
         if (firstTeam) setSelectedTeam(firstTeam);
       });
-  }, []);
+  }, [initialSquads]);
 
   useEffect(() => {
     if (!squads[selectedTeam]) return;
-    const { starters, subs } = pickStarting11(squads[selectedTeam], FORMATIONS[formation]);
+    const { starters, subs } = pickStarting11(squads[selectedTeam], FORMATION_433);
     setPitchPlayers(starters);
     setSubPlayers(subs);
-  }, [selectedTeam, squads, formation]);
+  }, [selectedTeam, squads]);
 
   const getClientPos = (e: MouseEvent | TouchEvent | React.MouseEvent | React.TouchEvent) => {
     if ('touches' in e) {
@@ -121,27 +125,12 @@ export default function App() {
     return ghost;
   };
 
-  const findDropTarget = useCallback((cx: number, cy: number) => {
-    const els = document.querySelectorAll<HTMLElement>('[data-type="player"], [data-type="sub"]');
-    for (const el of els) {
-      const r = el.getBoundingClientRect();
-      if (cx >= r.left && cx <= r.right && cy >= r.top && cy <= r.bottom) {
-        const type = el.dataset.type!;
-        const idx = parseInt(el.dataset.idx!);
-        if (type === dragSrcType && idx === dragSrcIdx) continue;
-        return { type, idx };
-      }
-    }
-    return null;
-  }, [dragSrcType, dragSrcIdx]);
-
   const doSwap = useCallback((srcType: string, srcIdx: number, tgtType: string, tgtIdx: number) => {
     if (srcType === 'player' && tgtType === 'player') {
       setPitchPlayers(prev => {
         const next = [...prev];
         const a = { ...next[srcIdx] };
         const b = { ...next[tgtIdx] };
-        // Keep positions, swap player data
         next[srcIdx] = { ...b, x: a.x, y: a.y, slotPos: a.slotPos };
         next[tgtIdx] = { ...a, x: b.x, y: b.y, slotPos: b.slotPos };
         return next;
@@ -259,15 +248,6 @@ export default function App() {
           >
             {teamNames.map(name => (
               <option key={name} value={name}>{name}</option>
-            ))}
-          </select>
-          <select
-            className="team-select"
-            value={formation}
-            onChange={(e) => setFormation(e.target.value)}
-          >
-            {Object.keys(FORMATIONS).map(f => (
-              <option key={f} value={f}>{f}</option>
             ))}
           </select>
         </div>
