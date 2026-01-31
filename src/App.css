@@ -4,23 +4,17 @@ body {
   background: #0a1128;
   color: #fff;
   font-family: 'Inter', sans-serif;
-  min-height: 100vh;
 }
 
 .app {
   display: flex;
-  flex-direction: column;
-  align-items: center;
+  justify-content: center;
   padding: 12px;
-  height: 100vh;
 }
 
 .main-area {
   display: flex;
   gap: 16px;
-  flex: 1;
-  min-height: 0;
-  width: 100%;
   max-width: 1100px;
 }
 
@@ -29,31 +23,74 @@ body {
   flex-direction: column;
   gap: 10px;
   align-items: center;
-  justify-content: center;
   flex-shrink: 0;
+  height: 650px;
+  width: 140px;
 }
 
 .team-badge {
-  width: 80px;
-  height: 80px;
+  width: 48px;
+  height: 48px;
   object-fit: contain;
   filter: drop-shadow(0 2px 8px rgba(0,0,0,0.5));
+  flex-shrink: 0;
 }
 
-.team-select {
-  background: #111d3a;
-  color: #fff;
-  border: 1px solid #1c2e50;
+.team-list-wrap {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+}
+
+
+.team-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  overflow-y: auto;
+  height: 100%;
+  width: 100%;
+  padding: 8px 0;
+}
+
+.team-list-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 8px;
+  background: transparent;
+  border: 1px solid transparent;
   border-radius: 6px;
-  padding: 8px 16px;
+  color: #8899b0;
   font-family: 'Inter', sans-serif;
-  font-size: 14px;
-  font-weight: 700;
+  font-size: 11px;
+  font-weight: 600;
   cursor: pointer;
-  outline: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: left;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
 }
 
-.team-select:hover { border-color: #4fc3f7; }
+.team-list-item:hover {
+  background: #111d3a;
+  color: #c0cfe0;
+}
+
+.team-list-item.active {
+  background: #111d3a;
+  border-color: #4fc3f7;
+  color: #fff;
+}
+
+.team-list-badge {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
 
 .formation-label {
   font-size: 28px;
@@ -210,12 +247,18 @@ img.player-photo {
 }
 
 /* Subs */
+.subs-wrap {
+  position: relative;
+  width: 150px;
+  height: 650px;
+  flex-shrink: 0;
+}
+
+
 .subs-section {
-  flex: 1;
-  min-width: 180px;
-  max-width: 220px;
   overflow-y: auto;
   height: 100%;
+  padding-bottom: 12px;
 }
 
 .subs-title {
@@ -295,3 +338,26 @@ img.player-photo {
 }
 
 .drag-ghost .jersey { width: 48px; height: 48px; }
+
+/* Scrollbars */
+.team-list::-webkit-scrollbar,
+.subs-section::-webkit-scrollbar {
+  width: 4px;
+}
+
+.team-list::-webkit-scrollbar-track,
+.subs-section::-webkit-scrollbar-track {
+  background: rgba(255,255,255,0.05);
+  border-radius: 2px;
+}
+
+.team-list::-webkit-scrollbar-thumb,
+.subs-section::-webkit-scrollbar-thumb {
+  background: rgba(79, 195, 247, 0.3);
+  border-radius: 2px;
+}
+
+.team-list::-webkit-scrollbar-thumb:hover,
+.subs-section::-webkit-scrollbar-thumb:hover {
+  background: rgba(79, 195, 247, 0.5);
+}

@@ -242,15 +242,20 @@ export default function App({ initialSquads, initialTeam }: AppProps = {}) {
           {selectedTeam && badgeUrl(selectedTeam) && (
             <img className="team-badge" src={badgeUrl(selectedTeam)} alt={selectedTeam} />
           )}
-          <select
-            className="team-select"
-            value={selectedTeam}
-            onChange={(e) => setSelectedTeam(e.target.value)}
-          >
-            {teamNames.map(name => (
-              <option key={name} value={name}>{name}</option>
-            ))}
-          </select>
+          <div className="team-list-wrap">
+            <div className="team-list">
+              {teamNames.map(name => (
+                <button
+                  key={name}
+                  className={`team-list-item${name === selectedTeam ? ' active' : ''}`}
+                  onClick={() => setSelectedTeam(name)}
+                >
+                  {badgeUrl(name) && <img className="team-list-badge" src={badgeUrl(name)} alt="" />}
+                  <span>{name}</span>
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
 
         <Pitch
@@ -263,15 +268,17 @@ export default function App({ initialSquads, initialTeam }: AppProps = {}) {
           onTouchStart={onDragStart as any}
         />
 
-        <SubsBench
-          subs={subPlayers}
-          draggingIdx={dragSrcIdx}
-          draggingType={dragSrcType}
-          dropTargetIdx={dropTargetIdx}
-          dropTargetType={dropTargetType}
-          onMouseDown={onDragStart as any}
-          onTouchStart={onDragStart as any}
-        />
+        <div className="subs-wrap">
+          <SubsBench
+            subs={subPlayers}
+            draggingIdx={dragSrcIdx}
+            draggingType={dragSrcType}
+            dropTargetIdx={dropTargetIdx}
+            dropTargetType={dropTargetType}
+            onMouseDown={onDragStart as any}
+            onTouchStart={onDragStart as any}
+          />
+        </div>
       </div>
     </div>
   );
