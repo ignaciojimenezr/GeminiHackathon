@@ -37,12 +37,6 @@
       "imgId": "250156002"
     },
     {
-      "name": "Piero Hincapié",
-      "num": 5,
-      "pos": "DEF",
-      "imgId": "250163454"
-    },
-    {
       "name": "Gabriel",
       "num": 6,
       "pos": "DEF",
@@ -65,12 +59,6 @@
       "num": 8,
       "pos": "MID",
       "imgId": "250081341"
-    },
-    {
-      "name": "Eberechi Eze",
-      "num": 10,
-      "pos": "MID",
-      "imgId": "250134376"
     },
     {
       "name": "Christian Nørgaard",
@@ -101,12 +89,6 @@
       "num": 29,
       "pos": "MID",
       "imgId": "250087938"
-    },
-    {
-      "name": "Martin Zubimendi",
-      "num": 36,
-      "pos": "MID",
-      "imgId": "250143679"
     },
     {
       "name": "Declan Rice",
@@ -305,12 +287,6 @@
       "imgId": "250079545"
     },
     {
-      "name": "Minjae Kim",
-      "num": 3,
-      "pos": "DEF",
-      "imgId": "250162325"
-    },
-    {
       "name": "Jonathan Tah",
       "num": 4,
       "pos": "DEF",
@@ -335,12 +311,6 @@
       "imgId": "250136348"
     },
     {
-      "name": "Cassiano Kiala",
-      "num": 30,
-      "pos": "DEF",
-      "imgId": "250205321"
-    },
-    {
       "name": "Josip Stanišić",
       "num": 44,
       "pos": "DEF",
@@ -357,12 +327,6 @@
       "num": 8,
       "pos": "MID",
       "imgId": "250041771"
-    },
-    {
-      "name": "Jamal Musiala",
-      "num": 10,
-      "pos": "MID",
-      "imgId": "250124430"
     },
     {
       "name": "Michael Olise",
@@ -389,12 +353,6 @@
       "imgId": "250065413"
     },
     {
-      "name": "Aleksandar Pavlović",
-      "num": 45,
-      "pos": "MID",
-      "imgId": "250163777"
-    },
-    {
       "name": "Serge Gnabry",
       "num": 7,
       "pos": "FWD",
@@ -405,12 +363,6 @@
       "num": 9,
       "pos": "FWD",
       "imgId": "250016833"
-    },
-    {
-      "name": "Nicolas Jackson",
-      "num": 11,
-      "pos": "FWD",
-      "imgId": "250163689"
     },
     {
       "name": "Luis Díaz",
@@ -449,12 +401,6 @@
       "num": 5,
       "pos": "DEF",
       "imgId": "250113290"
-    },
-    {
-      "name": "Levi Colwill",
-      "num": 6,
-      "pos": "DEF",
-      "imgId": "250128379"
     },
     {
       "name": "Jorrel Hato",
@@ -719,11 +665,6 @@
       "imgId": "250078922"
     },
     {
-      "name": "Defenders",
-      "num": 7,
-      "pos": "GK"
-    },
-    {
       "name": "Rúben Dias",
       "num": 3,
       "pos": "DEF",
@@ -764,12 +705,6 @@
       "num": 4,
       "pos": "MID",
       "imgId": "250121294"
-    },
-    {
-      "name": "Mateo Kovačić",
-      "num": 8,
-      "pos": "MID",
-      "imgId": "250023551"
     },
     {
       "name": "Rayan Cherki",
@@ -888,12 +823,6 @@
       "imgId": "250169685"
     },
     {
-      "name": "Bruno Ramos",
-      "num": 54,
-      "pos": "DEF",
-      "imgId": "250205713"
-    },
-    {
       "name": "Eduardo Quaresma",
       "num": 72,
       "pos": "DEF",
@@ -942,12 +871,6 @@
       "imgId": "250101557"
     },
     {
-      "name": "Rayan Lucas",
-      "num": 60,
-      "pos": "MID",
-      "imgId": "250199471"
-    },
-    {
       "name": "Geny Catamo",
       "num": 10,
       "pos": "FWD",
@@ -972,21 +895,10 @@
       "imgId": "250211008"
     },
     {
-      "name": "Fotis Ioannidis",
-      "num": 89,
-      "pos": "FWD",
-      "imgId": "250127400"
-    },
-    {
       "name": "Luis Suárez",
       "num": 97,
       "pos": "FWD",
       "imgId": "250147458"
-    },
-    {
-      "name": "Coach",
-      "num": 4,
-      "pos": "FWD"
     }
   ],
   "Tottenham": [
@@ -1057,12 +969,6 @@
       "imgId": "250067295"
     },
     {
-      "name": "Xavi Simons",
-      "num": 7,
-      "pos": "MID",
-      "imgId": "250128451"
-    },
-    {
       "name": "Archie Gray",
       "num": 14,
       "pos": "MID",
@@ -1115,12 +1021,6 @@
       "num": 19,
       "pos": "FWD",
       "imgId": "250066930"
-    },
-    {
-      "name": "Randal Kolo Muani",
-      "num": 39,
-      "pos": "FWD",
-      "imgId": "250146926"
     }
   ],
   "Atalanta": [
@@ -1141,11 +1041,6 @@
       "num": 57,
       "pos": "GK",
       "imgId": "250082738"
-    },
-    {
-      "name": "Defenders",
-      "num": 1,
-      "pos": "GK"
     },
     {
       "name": "Odilon Kossounou",
@@ -1256,12 +1151,6 @@
       "imgId": "250076743"
     },
     {
-      "name": "Ademola Lookman",
-      "num": 11,
-      "pos": "FWD",
-      "imgId": "250099258"
-    },
-    {
       "name": "Charles De Ketelaere",
       "num": 17,
       "pos": "FWD",
@@ -1278,11 +1167,6 @@
       "num": 90,
       "pos": "FWD",
       "imgId": "250105227"
-    },
-    {
-      "name": "Coach",
-      "num": 1,
-      "pos": "FWD"
     }
   ],
   "Atlético Madrid": [
@@ -1297,12 +1181,6 @@
       "num": 13,
       "pos": "GK",
       "imgId": "250012069"
-    },
-    {
-      "name": "Mario De Luis",
-      "num": 33,
-      "pos": "GK",
-      "imgId": "250144232"
     },
     {
       "name": "José María Giménez",
@@ -1551,11 +1429,6 @@
       "num": 27,
       "pos": "FWD",
       "imgId": "250127347"
-    },
-    {
-      "name": "Coach",
-      "num": 2,
-      "pos": "FWD"
     }
   ],
   "Benfica": [
@@ -1748,12 +1621,6 @@
       "imgId": "250129159"
     },
     {
-      "name": "Ulrik Saltnes",
-      "num": 14,
-      "pos": "MID",
-      "imgId": "250141867"
-    },
-    {
       "name": "Sondre Brunstad Fet",
       "num": 19,
       "pos": "MID",
@@ -1880,12 +1747,6 @@
       "num": 44,
       "pos": "DEF",
       "imgId": "250053044"
-    },
-    {
-      "name": "Samuel Van Hoogen",
-      "num": 82,
-      "pos": "DEF",
-      "imgId": "250189614"
     },
     {
       "name": "Ludovit Reis",
@@ -2020,12 +1881,6 @@
       "num": 42,
       "pos": "DEF",
       "imgId": "250043129"
-    },
-    {
-      "name": "Wilfried Singo",
-      "num": 90,
-      "pos": "DEF",
-      "imgId": "250132323"
     },
     {
       "name": "Arda Ünyay",
@@ -2244,11 +2099,6 @@
       "num": 14,
       "pos": "FWD",
       "imgId": "250173062"
-    },
-    {
-      "name": "Coach",
-      "num": 1,
-      "pos": "FWD"
     }
   ],
   "Juventus": [
@@ -2349,11 +2199,6 @@
       "imgId": "250116904"
     },
     {
-      "name": "Forwards",
-      "num": 3,
-      "pos": "MID"
-    },
-    {
       "name": "Francisco Conceição",
       "num": 7,
       "pos": "FWD",
@@ -2394,20 +2239,9 @@
       "num": 30,
       "pos": "FWD",
       "imgId": "250102035"
-    },
-    {
-      "name": "Coach",
-      "num": 2,
-      "pos": "FWD"
     }
   ],
   "Leverkusen": [
-    {
-      "name": "Jonas Omlin",
-      "num": 18,
-      "pos": "GK",
-      "imgId": "250072893"
-    },
     {
       "name": "Janis Blaswich",
       "num": 28,
@@ -2935,11 +2769,6 @@
       "num": 99,
       "pos": "FWD",
       "imgId": "250097909"
-    },
-    {
-      "name": "Coach",
-      "num": 2,
-      "pos": "FWD"
     }
   ],
   "Paris Saint-Germain": [
@@ -3046,11 +2875,6 @@
       "imgId": "250164991"
     },
     {
-      "name": "Forwards",
-      "num": 1,
-      "pos": "MID"
-    },
-    {
       "name": "Khvicha Kvaratskhelia",
       "num": 7,
       "pos": "FWD",
@@ -3089,12 +2913,6 @@
   ],
   "Qarabağ": [
     {
-      "name": "Amin Ramazanov",
-      "num": 89,
-      "pos": "GK",
-      "imgId": "250138479"
-    },
-    {
       "name": "Fabijan Buntić",
       "num": 97,
       "pos": "GK",
@@ -3105,11 +2923,6 @@
       "num": 99,
       "pos": "GK",
       "imgId": "250102244"
-    },
-    {
-      "name": "Defenders",
-      "num": 26,
-      "pos": "GK"
     },
     {
       "name": "Matheus Silva",
@@ -3160,11 +2973,6 @@
       "imgId": "250141155"
     },
     {
-      "name": "Midfielders",
-      "num": 1,
-      "pos": "DEF"
-    },
-    {
       "name": "Chris Kouakou",
       "num": 6,
       "pos": "MID",
@@ -3175,12 +2983,6 @@
       "num": 8,
       "pos": "MID",
       "imgId": "250042347"
-    },
-    {
-      "name": "Joni Montiel",
-      "num": 9,
-      "pos": "MID",
-      "imgId": "250097290"
     },
     {
       "name": "Abdellah Zoubir",
@@ -3229,11 +3031,6 @@
       "num": 22,
       "pos": "FWD",
       "imgId": "250113364"
-    },
-    {
-      "name": "Coach",
-      "num": 1,
-      "pos": "FWD"
     }
   ],
   "Real Madrid": [

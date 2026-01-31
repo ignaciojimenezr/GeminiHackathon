@@ -48,8 +48,14 @@ function pickStarting11(squad: PlayerData[], formation: FormationSlot[]): { star
       used.add(idx);
       starters.push({ ...player, x: slot.x, y: slot.y, slotPos: slot.label });
     } else {
-      // fallback: pick any unused player
-      const fallback = squad.findIndex((_, i) => !used.has(i));
+      // fallback: prefer nearby positions (MID for FWD, DEF for MID, etc.), never GK
+      const priority = slot.category === 'FWD' ? ['MID','DEF'] : slot.category === 'MID' ? ['FWD','DEF'] : ['MID','FWD'];
+      let fallback = -1;
+      for (const cat of priority) {
+        fallback = squad.findIndex((p, i) => p.pos === cat && !used.has(i));
+        if (fallback >= 0) break;
+      }
+      if (fallback < 0) fallback = squad.findIndex((p, i) => p.pos !== 'GK' && !used.has(i));
       if (fallback >= 0) {
         used.add(fallback);
         starters.push({ ...squad[fallback], x: slot.x, y: slot.y, slotPos: slot.label });
