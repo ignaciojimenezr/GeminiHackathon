@@ -119,12 +119,24 @@
     flex-direction: column;
     align-items: center;
     transform: translate(-50%, -50%);
-    cursor: pointer;
-    transition: transform 0.2s;
+    cursor: grab;
+    transition: transform 0.2s, filter 0.2s;
+    z-index: 1;
+    user-select: none;
   }
 
   .player:hover {
     transform: translate(-50%, -50%) scale(1.1);
+  }
+
+  .player.dragging {
+    opacity: 0.4;
+    cursor: grabbing;
+  }
+
+  .player.drop-target {
+    filter: brightness(1.8);
+    transform: translate(-50%, -50%) scale(1.2);
   }
 
   .jersey {
@@ -196,13 +208,43 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    cursor: pointer;
-    transition: border-color 0.2s, background 0.2s;
+    cursor: grab;
+    transition: border-color 0.2s, background 0.2s, transform 0.2s;
+    user-select: none;
   }
 
   .sub-card:hover {
     border-color: #4fc3f7;
     background: linear-gradient(135deg, #152544 0%, #111d3a 100%);
+  }
+
+  .sub-card.dragging {
+    opacity: 0.4;
+  }
+
+  .sub-card.drop-target {
+    border-color: #4fc3f7;
+    transform: scale(1.08);
+    background: linear-gradient(135deg, #1a3360 0%, #152544 100%);
+  }
+
+  .drag-ghost {
+    position: fixed;
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.9;
+    transform: translate(-50%, -50%);
+  }
+
+  .drag-ghost .jersey { width: 48px; height: 48px; }
+
+  .swap-flash {
+    animation: swapPulse 0.4s ease-out;
+  }
+
+  @keyframes swapPulse {
+    0% { filter: brightness(2); }
+    100% { filter: brightness(1); }
   }
 
   .sub-pos {
@@ -259,22 +301,21 @@ const jerseySVG = (color) => `
     fill="${color}" stroke="rgba(255,255,255,0.3)" stroke-width="1"/>
 </svg>`;
 
+const GK_COLOR = '#f4c542';
+const FIELD_COLOR = '#4fc3f7';
+
 const players = [
-  // GK
-  { name: 'Moreira', num: 1, x: 50, y: 92, pos: 'GK', color: '#f4c542' },
-  // Defenders
-  { name: 'Tanaka', num: 2, x: 15, y: 74, pos: 'RB', color: '#4fc3f7' },
-  { name: 'Okafor', num: 4, x: 38, y: 76, pos: 'CB', color: '#4fc3f7' },
-  { name: 'Jansen', num: 5, x: 62, y: 76, pos: 'CB', color: '#4fc3f7' },
-  { name: 'Dubois', num: 3, x: 85, y: 74, pos: 'LB', color: '#4fc3f7' },
-  // Midfielders
-  { name: 'Reyes', num: 8, x: 25, y: 52, pos: 'CM', color: '#4fc3f7' },
-  { name: 'Andersen', num: 6, x: 50, y: 56, pos: 'CDM', color: '#4fc3f7' },
-  { name: 'Kimura', num: 10, x: 75, y: 52, pos: 'CM', color: '#4fc3f7' },
-  // Forwards
-  { name: 'Fernandes', num: 7, x: 20, y: 28, pos: 'LW', color: '#4fc3f7' },
-  { name: 'Nkosi', num: 9, x: 50, y: 22, pos: 'ST', color: '#4fc3f7' },
-  { name: 'Volkov', num: 11, x: 80, y: 28, pos: 'RW', color: '#4fc3f7' },
+  { name: 'Moreira', num: 1, x: 50, y: 92, pos: 'GK' },
+  { name: 'Tanaka', num: 2, x: 15, y: 74, pos: 'RB' },
+  { name: 'Okafor', num: 4, x: 38, y: 76, pos: 'CB' },
+  { name: 'Jansen', num: 5, x: 62, y: 76, pos: 'CB' },
+  { name: 'Dubois', num: 3, x: 85, y: 74, pos: 'LB' },
+  { name: 'Reyes', num: 8, x: 25, y: 52, pos: 'CM' },
+  { name: 'Andersen', num: 6, x: 50, y: 56, pos: 'CDM' },
+  { name: 'Kimura', num: 10, x: 75, y: 52, pos: 'CM' },
+  { name: 'Fernandes', num: 7, x: 20, y: 28, pos: 'LW' },
+  { name: 'Nkosi', num: 9, x: 50, y: 22, pos: 'ST' },
+  { name: 'Volkov', num: 11, x: 80, y: 28, pos: 'RW' },
 ];
 
 const subs = [
@@ -288,32 +329,172 @@ const subs = [
 ];
 
 const pitch = document.querySelector('.pitch');
+const subsRow = document.getElementById('subs-row');
 
-players.forEach(p => {
+function colorFor(pos) { return pos === 'GK' ? GK_COLOR : FIELD_COLOR; }
+
+// ── Render helpers ──
+
+function renderPlayer(p, idx) {
   const el = document.createElement('div');
   el.className = 'player';
   el.style.left = p.x + '%';
   el.style.top = p.y + '%';
+  el.dataset.idx = idx;
+  el.dataset.type = 'player';
   el.innerHTML = `
     <div class="jersey">
-      ${jerseySVG(p.color)}
+      ${jerseySVG(colorFor(p.pos))}
       <span class="jersey-number">${p.num}</span>
     </div>
     <span class="player-name">${p.name}</span>
   `;
+  el.addEventListener('mousedown', onDragStart);
+  el.addEventListener('touchstart', onDragStart, { passive: false });
   pitch.appendChild(el);
-});
+  return el;
+}
 
-const subsRow = document.getElementById('subs-row');
-subs.forEach(s => {
+function renderSub(s, idx) {
   const card = document.createElement('div');
   card.className = 'sub-card';
+  card.dataset.idx = idx;
+  card.dataset.type = 'sub';
   card.innerHTML = `
     <span class="sub-pos">${s.pos}</span>
     <span class="sub-name">${s.name}</span>
   `;
+  card.addEventListener('mousedown', onDragStart);
+  card.addEventListener('touchstart', onDragStart, { passive: false });
   subsRow.appendChild(card);
-});
+  return card;
+}
+
+let playerEls = [];
+let subEls = [];
+
+function renderAll() {
+  // Clear
+  pitch.querySelectorAll('.player').forEach(el => el.remove());
+  subsRow.innerHTML = '';
+  playerEls = players.map((p, i) => renderPlayer(p, i));
+  subEls = subs.map((s, i) => renderSub(s, i));
+}
+
+renderAll();
+
+// ── Drag & Drop ──
+
+let dragState = null; // { type, idx, ghost, el }
+
+function onDragStart(e) {
+  e.preventDefault();
+  const el = e.currentTarget;
+  const type = el.dataset.type;
+  const idx = +el.dataset.idx;
+  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+  const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+  // Create ghost
+  const ghost = document.createElement('div');
+  ghost.className = 'drag-ghost';
+  const data = type === 'player' ? players[idx] : subs[idx];
+  ghost.innerHTML = `
+    <div class="jersey">
+      ${jerseySVG(colorFor(data.pos))}
+      <span class="jersey-number" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-45%);font-size:13px;font-weight:900;color:#0a1128;">${data.num}</span>
+    </div>
+  `;
+  ghost.style.left = clientX + 'px';
+  ghost.style.top = clientY + 'px';
+  document.body.appendChild(ghost);
+
+  el.classList.add('dragging');
+  dragState = { type, idx, ghost, el };
+
+  document.addEventListener('mousemove', onDragMove);
+  document.addEventListener('mouseup', onDragEnd);
+  document.addEventListener('touchmove', onDragMove, { passive: false });
+  document.addEventListener('touchend', onDragEnd);
+}
+
+function onDragMove(e) {
+  if (!dragState) return;
+  e.preventDefault();
+  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+  const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+  dragState.ghost.style.left = clientX + 'px';
+  dragState.ghost.style.top = clientY + 'px';
+
+  // Highlight drop targets
+  clearHighlights();
+  const target = getDropTarget(clientX, clientY);
+  if (target) target.el.classList.add('drop-target');
+}
+
+function onDragEnd(e) {
+  if (!dragState) return;
+  const clientX = e.changedTouches ? e.changedTouches[0].clientX : e.clientX;
+  const clientY = e.changedTouches ? e.changedTouches[0].clientY : e.clientY;
+
+  clearHighlights();
+  dragState.ghost.remove();
+  dragState.el.classList.remove('dragging');
+
+  const target = getDropTarget(clientX, clientY);
+  if (target) doSwap(dragState, target);
+
+  dragState = null;
+  document.removeEventListener('mousemove', onDragMove);
+  document.removeEventListener('mouseup', onDragEnd);
+  document.removeEventListener('touchmove', onDragMove);
+  document.removeEventListener('touchend', onDragEnd);
+}
+
+function getDropTarget(cx, cy) {
+  const allEls = [...playerEls, ...subEls];
+  for (const el of allEls) {
+    if (dragState && el === dragState.el) continue;
+    const r = el.getBoundingClientRect();
+    if (cx >= r.left && cx <= r.right && cy >= r.top && cy <= r.bottom) {
+      return { type: el.dataset.type, idx: +el.dataset.idx, el };
+    }
+  }
+  return null;
+}
+
+function clearHighlights() {
+  document.querySelectorAll('.drop-target').forEach(el => el.classList.remove('drop-target'));
+}
+
+function doSwap(src, tgt) {
+  if (src.type === 'player' && tgt.type === 'player') {
+    // Swap two on-pitch players (swap data but keep positions)
+    const a = players[src.idx];
+    const b = players[tgt.idx];
+    // Swap everything except x/y
+    const keep = ['x', 'y'];
+    const tmpA = { ...a };
+    for (const k of Object.keys(a)) {
+      if (!keep.includes(k)) { a[k] = b[k]; b[k] = tmpA[k]; }
+    }
+  } else if (src.type === 'sub' && tgt.type === 'sub') {
+    // Swap two subs
+    const tmp = { ...subs[src.idx] };
+    Object.assign(subs[src.idx], subs[tgt.idx]);
+    Object.assign(subs[tgt.idx], tmp);
+  } else {
+    // Swap between pitch and bench
+    const pIdx = src.type === 'player' ? src.idx : tgt.idx;
+    const sIdx = src.type === 'sub' ? src.idx : tgt.idx;
+    const p = players[pIdx];
+    const s = subs[sIdx];
+    const tmpName = p.name, tmpNum = p.num, tmpPos = p.pos;
+    p.name = s.name; p.num = s.num; p.pos = s.pos;
+    s.name = tmpName; s.num = tmpNum; s.pos = tmpPos;
+  }
+  renderAll();
+}
 </script>
 </body>
 </html>
