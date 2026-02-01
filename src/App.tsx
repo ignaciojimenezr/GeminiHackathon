@@ -117,7 +117,7 @@ export default function App({ initialSquads, initialTeam }: AppProps = {}) {
     const ghost = document.createElement('div');
     ghost.className = 'drag-ghost';
     if (player.imgId) {
-      ghost.innerHTML = `<div class="player-photo" style="width:48px;height:48px"><img src="https://img.uefa.com/imgml/TP/players/1/2026/cutoff/${player.imgId}.webp" style="width:100%;height:100%;object-fit:cover;border-radius:50%"/></div>`;
+      ghost.innerHTML = `<img class="player-photo" src="https://img.uefa.com/imgml/TP/players/1/2026/cutoff/${player.imgId}.webp" />`;
     } else {
       const color = player.pos === 'GK' ? '#f4c542' : '#4fc3f7';
       ghost.innerHTML = `<div class="jersey"><svg viewBox="0 0 60 58" xmlns="http://www.w3.org/2000/svg"><path d="M15 2 L5 14 L12 18 L12 54 L48 54 L48 18 L55 14 L45 2 L38 8 C35 10 25 10 22 8 Z" fill="${color}" stroke="rgba(255,255,255,0.3)" stroke-width="1"/></svg><span class="jersey-number">${player.num}</span></div>`;

@@ -24,7 +24,7 @@ body {
   gap: 10px;
   align-items: center;
   flex-shrink: 0;
-  height: 650px;
+  height: 440px;
   width: 140px;
 }
 
@@ -101,7 +101,7 @@ body {
 /* Pitch */
 .pitch {
   position: relative;
-  height: 650px;
+  height: 440px;
   aspect-ratio: 68 / 105;
   background: linear-gradient(180deg, #0d3b1e 0%, #145a2a 50%, #0d3b1e 100%);
   border: 2px solid #1a5c30;
@@ -183,7 +183,7 @@ body {
 }
 
 .player.dragging {
-  opacity: 0.4;
+  opacity: 0.3;
   cursor: grabbing;
 }
 
@@ -193,8 +193,8 @@ body {
 }
 
 .jersey {
-  width: 40px;
-  height: 40px;
+  width: 32px;
+  height: 32px;
   position: relative;
 }
 
@@ -218,8 +218,8 @@ body {
 
 /* Player photo */
 img.player-photo {
-  width: 80px;
-  height: 80px;
+  width: 60px;
+  height: 60px;
   object-fit: cover;
   display: block;
   filter: drop-shadow(0 2px 4px rgba(0,0,0,0.6));
@@ -236,8 +236,8 @@ img.player-photo {
 }
 
 .player-name {
-  margin-top: 4px;
-  font-size: 10px;
+  margin-top: 2px;
+  font-size: 9px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -250,7 +250,7 @@ img.player-photo {
 .subs-wrap {
   position: relative;
   width: 150px;
-  height: 650px;
+  height: 440px;
   flex-shrink: 0;
 }
 
@@ -337,7 +337,8 @@ img.player-photo {
   transform: translate(-50%, -50%);
 }
 
-.drag-ghost .jersey { width: 48px; height: 48px; }
+.drag-ghost .jersey { width: 40px; height: 40px; }
+.drag-ghost .player-photo { width: 60px; height: 60px; }
 
 /* Scrollbars */
 .team-list::-webkit-scrollbar,
