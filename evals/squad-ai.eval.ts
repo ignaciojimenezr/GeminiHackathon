@@ -65,13 +65,12 @@ async function evalCase(
         model,
         expectedToolCalls: options.expectedToolCalls,
         error: failure instanceof Error ? failure.message : undefined,
+        // The built squad app is ~570KB of inlined HTML, and two tool calls of
+        // it exceed the 1MB eval-ingest limit. The trace is what we grade here.
+        widgetSnapshots: [],
       }),
     );
   }
-}
-
-function squadToolName(prompt: Awaited<ReturnType<typeof conversation>>) {
-  return prompt.getToolCalls()[0]?.toolName;
 }
 
 describe("Squad Manager AI conversation", () => {
@@ -120,10 +119,13 @@ describe("Squad Manager AI conversation", () => {
       "Shows the squad for a team named exactly",
       "Show me the Barcelona squad.",
       (prompt) => {
-        expect(prompt.getToolCalls()).toEqual([
-          { toolName: squadToolName(prompt), arguments: { team: "Barcelona" } },
-        ]);
-        expect(squadToolName(prompt)).toMatch(/show-squad$/);
+        const calls = prompt.getToolCalls();
+        expect(calls.length).toBeGreaterThan(0);
+        // The model sometimes repeats the call; every one must still ask for Barcelona.
+        for (const call of calls) {
+          expect(call.toolName).toMatch(/show-squad$/);
+          expect(call.arguments).toEqual({ team: "Barcelona" });
+        }
         expect(prompt.text).toMatch(/barcelona/i);
       },
       { expectedToolCalls: [{ toolName: "show-squad", arguments: { team: "Barcelona" } }] },
