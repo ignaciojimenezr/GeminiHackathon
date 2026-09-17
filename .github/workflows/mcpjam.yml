@@ -1,0 +1,36 @@
+name: MCPJam evals
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  evals:
+    name: Squad Manager AI conversation
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - run: npm run build:mcp
+
+      - name: Start the MCP server
+        run: |
+          npm run serve &
+          npx -y wait-on tcp:localhost:3001 --timeout 60000
+
+      - uses: MCPJam/inspector/actions/evals@evals-v1
+        with:
+          api-key: ${{ secrets.MCPJAM_API_KEY }}
+          command: npm run eval:ai
+          comment: true
