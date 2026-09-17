@@ -213,16 +213,22 @@ describe("Squad Manager AI conversation", () => {
     );
   });
 
-  it("FAILS: says it cannot find an unknown team", async () => {
+  it("FAILS: filters the squad by formation", async () => {
     await evalCase(
-      "Says it cannot find an unknown team",
-      "Show me the Ajax squad.",
+      "Filters the squad by formation",
+      "Show me Barcelona in a 4-3-3.",
       (prompt) => {
-        // show-squad silently falls back to the first team instead of erroring,
-        // so the model has nothing to report the miss with.
-        expect(prompt.text).toMatch(/not (in|available|found)|cannot find|no squad/i);
+        const calls = squadCalls(prompt);
+        expect(calls.length).toBeGreaterThan(0);
+        // show-squad takes only `team`, so the model cannot pass a formation
+        // however the user asks for it.
+        expect((calls[0].arguments as { formation?: string }).formation).toBe("4-3-3");
       },
-      { expectedToolCalls: [{ toolName: "show-squad", arguments: { team: "Ajax" } }] },
+      {
+        expectedToolCalls: [
+          { toolName: "show-squad", arguments: { team: "Barcelona", formation: "4-3-3" } },
+        ],
+      },
     );
   });
 
