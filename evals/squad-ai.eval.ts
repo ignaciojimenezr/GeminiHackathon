@@ -114,36 +114,67 @@ describe("Squad Manager AI conversation", () => {
     }
   });
 
+  const squadCalls = (prompt: Awaited<ReturnType<typeof conversation>>) =>
+    prompt.getToolCalls().filter((call) => /show-squad$/.test(call.toolName));
+
+  const teamCase = (title: string, query: string, team: string) =>
+    evalCase(
+      title,
+      query,
+      (prompt) => {
+        const calls = squadCalls(prompt);
+        expect(calls.length).toBeGreaterThan(0);
+        // The model sometimes repeats the call; every one must ask for the same team.
+        for (const call of calls) {
+          expect((call.arguments as { team?: string }).team).toBe(team);
+        }
+      },
+      { expectedToolCalls: [{ toolName: "show-squad", arguments: { team } }] },
+    );
+
   it("shows the squad for a team named exactly", async () => {
-    await evalCase(
+    await teamCase(
       "Shows the squad for a team named exactly",
       "Show me the Barcelona squad.",
-      (prompt) => {
-        const calls = prompt.getToolCalls();
-        expect(calls.length).toBeGreaterThan(0);
-        // The model sometimes repeats the call; every one must still ask for Barcelona.
-        for (const call of calls) {
-          expect(call.toolName).toMatch(/show-squad$/);
-          expect(call.arguments).toEqual({ team: "Barcelona" });
-        }
-        expect(prompt.text).toMatch(/barcelona/i);
-      },
-      { expectedToolCalls: [{ toolName: "show-squad", arguments: { team: "Barcelona" } }] },
+      "Barcelona",
     );
   });
 
-  it("resolves a nickname to the real team", async () => {
+  it("shows Real Madrid", async () => {
+    await teamCase("Shows Real Madrid", "Show me Real Madrid.", "Real Madrid");
+  });
+
+  it("shows Liverpool", async () => {
+    await teamCase("Shows Liverpool", "Let me see Liverpool.", "Liverpool");
+  });
+
+  it("shows Inter", async () => {
+    await teamCase("Shows Inter", "Open the Inter squad.", "Inter");
+  });
+
+  it("passes a nickname through to the server", async () => {
     await evalCase(
-      "Resolves a nickname to the real team",
+      "Passes a nickname through to the server",
       "Pull up PSG.",
       (prompt) => {
-        const calls = prompt.getToolCalls();
-        expect(calls).toHaveLength(1);
-        expect(calls[0].toolName).toMatch(/show-squad$/);
+        const calls = squadCalls(prompt);
+        expect(calls.length).toBeGreaterThan(0);
         // The server does the fuzzy match, so it answers with the full name.
         expect(prompt.text).toMatch(/paris saint-germain/i);
       },
       { expectedToolCalls: [{ toolName: "show-squad", arguments: { team: "PSG" } }] },
+    );
+  });
+
+  it("resolves the Barca alias", async () => {
+    await evalCase(
+      "Resolves the Barca alias",
+      "Show me Barca.",
+      (prompt) => {
+        expect(squadCalls(prompt).length).toBeGreaterThan(0);
+        expect(prompt.text).toMatch(/barcelona/i);
+      },
+      { expectedToolCalls: [{ toolName: "show-squad", arguments: { team: "Barca" } }] },
     );
   });
 
@@ -156,6 +187,56 @@ describe("Squad Manager AI conversation", () => {
         expect(prompt.text).toMatch(/squad|team/i);
       },
       { maxSteps: 1, expectedToolCalls: [] },
+    );
+  });
+
+  // The three cases below are expected to fail. They pin behaviour the server
+  // does not have yet, so a red row in the PR comment is the point.
+
+  it("FAILS: normalizes a nickname before calling the tool", async () => {
+    await evalCase(
+      "Normalizes a nickname before calling the tool",
+      "Pull up PSG.",
+      (prompt) => {
+        const calls = squadCalls(prompt);
+        expect(calls.length).toBeGreaterThan(0);
+        // The server owns the fuzzy match, so the model passes "PSG" unchanged.
+        expect((calls[0].arguments as { team?: string }).team).toBe(
+          "Paris Saint-Germain",
+        );
+      },
+      {
+        expectedToolCalls: [
+          { toolName: "show-squad", arguments: { team: "Paris Saint-Germain" } },
+        ],
+      },
+    );
+  });
+
+  it("FAILS: says it cannot find an unknown team", async () => {
+    await evalCase(
+      "Says it cannot find an unknown team",
+      "Show me the Ajax squad.",
+      (prompt) => {
+        // show-squad silently falls back to the first team instead of erroring,
+        // so the model has nothing to report the miss with.
+        expect(prompt.text).toMatch(/not (in|available|found)|cannot find|no squad/i);
+      },
+      { expectedToolCalls: [{ toolName: "show-squad", arguments: { team: "Ajax" } }] },
+    );
+  });
+
+  it("FAILS: reports a player name from the squad", async () => {
+    await evalCase(
+      "Reports a player name from the squad",
+      "Show me Barcelona and name one player in the squad.",
+      (prompt) => {
+        expect(squadCalls(prompt).length).toBeGreaterThan(0);
+        // show-squad returns only the team and the team list — no player data
+        // reaches the model, so it cannot name one.
+        expect(prompt.text).toMatch(/lamine|yamal|raphinha|lewandowski|ter stegen/i);
+      },
+      { expectedToolCalls: [{ toolName: "show-squad", arguments: { team: "Barcelona" } }] },
     );
   });
 });
