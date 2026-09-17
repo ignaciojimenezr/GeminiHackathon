@@ -14,7 +14,7 @@ const results: EvalResultInput[] = [];
 
 // `mcpjam/` runs the model on MCPJam credits, so MCPJAM_API_KEY is the only
 // secret this eval needs — no Anthropic or Google key in CI.
-const model = "mcpjam/anthropic/claude-haiku-4-5-20251001";
+const model = "mcpjam/anthropic/claude-haiku-4.5";
 const provider = "mcpjam";
 
 const SYSTEM_PROMPT = [
