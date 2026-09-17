@@ -226,17 +226,19 @@ describe("Squad Manager AI conversation", () => {
     );
   });
 
-  it("FAILS: reports a player name from the squad", async () => {
+  it("FAILS: looks players up with a dedicated tool", async () => {
     await evalCase(
-      "Reports a player name from the squad",
-      "Show me Barcelona and name one player in the squad.",
+      "Looks players up with a dedicated tool",
+      "List the Barcelona players.",
       (prompt) => {
-        expect(squadCalls(prompt).length).toBeGreaterThan(0);
-        // show-squad returns only the team and the team list — no player data
-        // reaches the model, so it cannot name one.
-        expect(prompt.text).toMatch(/lamine|yamal|raphinha|lewandowski|ter stegen/i);
+        // The server exposes only show-squad. Asked for players, the model
+        // answers from its own memory instead, which is the failure worth
+        // seeing: there is no list-players tool to ground it.
+        expect(
+          prompt.getToolCalls().some((call) => /list-players$/.test(call.toolName)),
+        ).toBe(true);
       },
-      { expectedToolCalls: [{ toolName: "show-squad", arguments: { team: "Barcelona" } }] },
+      { expectedToolCalls: [{ toolName: "list-players", arguments: { team: "Barcelona" } }] },
     );
   });
 });
