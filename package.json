@@ -12,7 +12,8 @@
     "dev:mcp": "concurrently \"cross-env INPUT=mcp-app.html vite build --watch\" \"tsx --watch main.ts\"",
     "preview": "vite preview",
     "scrape": "node scripts/scrape-squads.mjs",
-    "eval:ai": "vitest run --config vitest.ai.config.ts"
+    "eval:ai": "vitest run --config vitest.ai.config.ts",
+    "eval:client": "vitest run --config vitest.client.config.ts"
   },
   "dependencies": {
     "@modelcontextprotocol/ext-apps": "^1.0.1",
