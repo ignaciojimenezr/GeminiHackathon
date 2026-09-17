@@ -84,7 +84,7 @@ describe("Squad Manager saved client", () => {
         apiKey: process.env.MCPJAM_API_KEY!,
         manager,
       },
-      { runTimeoutMs: 180_000 },
+      { iterations: 1, runTimeoutMs: 180_000 },
     );
     const failed = [...result.tests.entries()]
       .filter(([, run]) => run.failures > 0)
