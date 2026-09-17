@@ -10,11 +10,6 @@ const projectId = process.env.MCPJAM_PROJECT_ID ?? "v97c9m21azjew0mzk47xxr55b586
 
 const suite = new EvalSuite({ name: "Squad Manager Suite" });
 
-// `stopAfterToolCall` ends the turn at the first tool call. It keeps each case
-// to one widget snapshot, which is what keeps the upload under the 1MB limit
-// for this ~570KB app.
-const STOP_AT_TOOL = { stopAfterToolCall: "show-squad" } as const;
-
 const squadCalls = (result: { getToolCalls(): { toolName: string; arguments: unknown }[] }) =>
   result.getToolCalls().filter((call) => /show-squad$/.test(call.toolName));
 
@@ -25,7 +20,7 @@ function teamCase(id: string, name: string, query: string, team: string) {
     name,
     expectedToolCalls: [{ toolName: "show-squad", arguments: { team } }],
     test: async (client) => {
-      const calls = squadCalls(await client.run(query, STOP_AT_TOOL));
+      const calls = squadCalls(await client.run(query));
       return (
         calls.length > 0 &&
         calls.every((call) => (call.arguments as { team?: string }).team === team)
@@ -48,7 +43,7 @@ suite.add(
     expectedToolCalls: [{ toolName: "show-squad", arguments: { team: "PSG" } }],
     test: async (client) => {
       // The server owns the fuzzy match, so the model just forwards "PSG".
-      const calls = squadCalls(await client.run("Pull up PSG.", STOP_AT_TOOL));
+      const calls = squadCalls(await client.run("Pull up PSG."));
       return calls.length === 1;
     },
   }),
@@ -60,7 +55,7 @@ suite.add(
     name: "Resolves the Barca alias",
     expectedToolCalls: [{ toolName: "show-squad", arguments: { team: "Barca" } }],
     test: async (client) => {
-      const calls = squadCalls(await client.run("Show me Barca.", STOP_AT_TOOL));
+      const calls = squadCalls(await client.run("Show me Barca."));
       return calls.length > 0;
     },
   }),
@@ -77,7 +72,7 @@ suite.add(
       { toolName: "show-squad", arguments: { team: "Paris Saint-Germain" } },
     ],
     test: async (client) => {
-      const calls = squadCalls(await client.run("Pull up PSG.", STOP_AT_TOOL));
+      const calls = squadCalls(await client.run("Pull up PSG."));
       return (
         calls.length > 0 &&
         (calls[0].arguments as { team?: string }).team === "Paris Saint-Germain"
