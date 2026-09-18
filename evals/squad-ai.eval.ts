@@ -65,9 +65,6 @@ async function evalCase(
         model,
         expectedToolCalls: options.expectedToolCalls,
         error: failure instanceof Error ? failure.message : undefined,
-        // The built squad app is ~570KB of inlined HTML, and two tool calls of
-        // it exceed the 1MB eval-ingest limit. The trace is what we grade here.
-        widgetSnapshots: [],
       }),
     );
   }
