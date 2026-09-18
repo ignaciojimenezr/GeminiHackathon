@@ -12,7 +12,6 @@
     "dev:mcp": "concurrently \"cross-env INPUT=mcp-app.html vite build --watch\" \"tsx --watch main.ts\"",
     "preview": "vite preview",
     "scrape": "node scripts/scrape-squads.mjs",
-    "eval:ai": "vitest run --config vitest.ai.config.ts",
     "eval:client": "vitest run --config vitest.client.config.ts"
   },
   "dependencies": {
@@ -25,7 +24,7 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
-    "@mcpjam/sdk": "^8.11.0",
+    "@mcpjam/sdk": "^8.11.1",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
     "@types/node": "^25.1.0",

@@ -32,13 +32,7 @@ jobs:
       - uses: MCPJam/inspector/actions/evals@evals-v1
         with:
           api-key: ${{ secrets.MCPJAM_API_KEY }}
-          command: npm run eval:ai
+          # The model and prompt come from the saved MCPJam client "Claude";
+          # nothing in this repo names a model.
+          command: npm run eval:client
           comment: true
-
-      # Same cases, but the model and prompt come from the saved MCPJam client.
-      - name: Saved client evals
-        # The action step goes red on an expected failure; this suite still runs.
-        if: always()
-        env:
-          MCPJAM_API_KEY: ${{ secrets.MCPJAM_API_KEY }}
-        run: npm run eval:client
