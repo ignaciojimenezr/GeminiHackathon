@@ -37,6 +37,8 @@ jobs:
 
       # Same cases, but the model and prompt come from the saved MCPJam client.
       - name: Saved client evals
+        # The action step goes red on an expected failure; this suite still runs.
+        if: always()
         env:
           MCPJAM_API_KEY: ${{ secrets.MCPJAM_API_KEY }}
         run: npm run eval:client
